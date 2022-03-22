@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using FakeDataGenerator.Models.Instant;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,33 +32,38 @@ namespace FakeDataGenerator
 
                     services.AddScoped<IFakeDataGenerator, FakeDataGenerator>();
                 })
+                // https://hovermind.com/serilog/logging-to-sink.html
                 .UseSerilog(new LoggerConfiguration()
+                    .ReadFrom.Configuration(configuration)
                     .MinimumLevel.Debug()
                     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                     .MinimumLevel.Override("System", LogEventLevel.Warning)
                     .Enrich.FromLogContext()
+                    .Enrich.WithMachineName()
+                    .Enrich.WithProperty("ApplicationName", AppDomain.CurrentDomain.FriendlyName)
+                    .Enrich.WithProperty("Version", Assembly.GetEntryAssembly().GetName().Version)
                     .WriteTo.File(
                         path: Path.Combine(logFilePath, $"{logFileName}.{DateTime.Now:yyyyMMdd_HHmm}.txt"),
-                        fileSizeLimitBytes:1_000_000,
-                        rollOnFileSizeLimit: true,
-                        shared: true,
-                        flushToDiskInterval: TimeSpan.FromDays(1)
+                        shared: true
                     )
-                    .WriteTo
-                    .Console(
-                        outputTemplate: "[{TimeStamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{Exception}{NewLine}",
+                    .WriteTo.Console(
+                        outputTemplate: $"[{{TimeStamp:HH:mm:ss}} {{Level:u3}} {{MachineName}} {{ApplicationName}} {{Version}} ] {{SourceContext}}{{Message:lj}}{{NewLine}}{{Exception}}",
                         theme: AnsiConsoleTheme.Literate
                     )
                     .CreateLogger())
                 .Build();
-
+            
             return host;
         }
 
         private static IConfiguration BuildHost(ConfigurationBuilder configurationBuilder)
         {
-            return configurationBuilder.SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            string env = Environment.GetEnvironmentVariable("ASPNETCORE_VARIABLE") ?? Environments.Production;
+            
+            return configurationBuilder
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+                .AddJsonFile($"appsettings.{env}.json", optional: false, reloadOnChange: false)
                 .AddEnvironmentVariables()
                 .Build();
         }
