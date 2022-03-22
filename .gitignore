@@ -422,6 +422,7 @@ $RECYCLE.BIN/
 
 # JetBrains Rider
 .idea/
+.idea/*
 *.sln.iml
 
 ##
