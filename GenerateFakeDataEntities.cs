@@ -2,20 +2,21 @@
 using System.Collections.Generic;
 using Bogus;
 using FakeDataGenerator.Models.Instant;
-// ReSharper disable All
 
 namespace FakeDataGenerator
 {
     public interface IGenerateFakeDataEntities
     {
-        List<InstantPaycardInfo> GenerateInstantEntity(int amountOfGeneratedData, string externalLocId);
+        List<InstantPaycardInfo> GenerateInstantEntity(int amountOfGeneratedData);
     }
     
     public class GenerateFakeDataEntities : IGenerateFakeDataEntities
     {
-        public List<InstantPaycardInfo> GenerateInstantEntity(int amountOfGeneratedData, string externalLocId)
+        public List<InstantPaycardInfo> GenerateInstantEntity(int amountOfGeneratedData)
         {
             Random random = new Random();
+            string[] _externalLocationIds = new string[] {"123", "321"};
+            string externalLocId = _externalLocationIds[random.Next(_externalLocationIds.Length)];
             
             var jobInfo = new Faker<JobInfo>()
                 .RuleFor(o => o.HourlyRate, f => f.Finance.Amount(0, 20).OrNull(f, .5f))

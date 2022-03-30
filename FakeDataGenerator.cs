@@ -13,8 +13,6 @@ namespace FakeDataGenerator
     
     public class FakeDataGenerator: IFakeDataGenerator
     {
-        // external log id for testing purpose
-        private static readonly string[] _externalLocationIds = new string[] {"123", "321"};
         private readonly string _generatedDataPath;
         private readonly ILogger _logger;
         private readonly IFileHandler _fileHandler;
@@ -33,17 +31,21 @@ namespace FakeDataGenerator
         public async Task GeneratedDataAsync(int amountOfGeneratedData)
         {
             _logger.Information("Start processing.");
+            
+            string fullPath = GenerateFullPath(amountOfGeneratedData);
 
-            string externalLocId = _externalLocationIds[new Random().Next(_externalLocationIds.Length)];
-            string fullPath = Path.Combine(_generatedDataPath,
-                $"Date_{DateTime.Now:dd_MM_yyyy_hh_ss}-iteration_{amountOfGeneratedData}-locid_{externalLocId}.json");
-
-            var instantData = _generateFakeDataEntities.GenerateInstantEntity(amountOfGeneratedData, externalLocId);
+            var instantData = _generateFakeDataEntities.GenerateInstantEntity(amountOfGeneratedData);
             await _fileHandler.SaveAsJsonFileAsync(instantData, fullPath);
             
             _logger.Information("The process completed.");  
         }
-        
+
+        private string GenerateFullPath(int amountOfGeneratedData)
+        {
+            return Path.Combine(_generatedDataPath,
+                $"Date_{DateTime.Now:dd_MM_yyyy_hh_ss}-iteration_{amountOfGeneratedData}.json");
+        }
+
         private void PrepareEnvironment()
         {
             if (!Directory.Exists(_generatedDataPath))

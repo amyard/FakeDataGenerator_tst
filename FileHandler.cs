@@ -40,7 +40,6 @@ namespace FakeDataGenerator
                     await writer.FlushAsync();
                 }
 
-                // ReSharper disable once SuggestVarOrType_SimpleTypes
                 FileInfo fileInfo = new FileInfo(fullPath);
                 if (fileInfo.Exists && fileInfo.Length > 0)
                 {
