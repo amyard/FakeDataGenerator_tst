@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using FakeDataGenerator.Enums;
 using FakeDataGenerator.Models.General;
 using Serilog;
 
@@ -8,7 +9,7 @@ namespace FakeDataGenerator
 {
     public interface IFakeDataGenerator
     {
-        Task GeneratedDataAsync(int amountOfGeneratedData);
+        Task GeneratedDataAsync(ArgumentEntity argumentEntity);
     }
     
     public class FakeDataGenerator: IFakeDataGenerator
@@ -28,13 +29,23 @@ namespace FakeDataGenerator
             PrepareEnvironment();
         }
 
-        public async Task GeneratedDataAsync(int amountOfGeneratedData)
+        public async Task GeneratedDataAsync(ArgumentEntity argumentEntity)
         {
             _logger.Information("Start processing.");
             
-            string fullPath = GenerateFullPath(amountOfGeneratedData);
+            string fullPath = GenerateFullPath(argumentEntity.AmountOfGeneratedData);
 
-            var instantData = _generateFakeDataEntities.GenerateInstantEntity(amountOfGeneratedData);
+            var instantData = _generateFakeDataEntities.GenerateInstantEntity(argumentEntity.AmountOfGeneratedData);
+
+            // var data = argumentEntity.EntityNameForMapping switch
+            // {
+            //     ClassNameForMapping.Instant => _generateFakeDataEntities.GenerateInstantEntity(argumentEntity
+            //         .AmountOfGeneratedData),
+            //     ClassNameForMapping.TableUser => _generateFakeDataEntities.GenerateTableUserEntity(argumentEntity
+            //         .AmountOfGeneratedData),
+            //     _ => _generateFakeDataEntities.GenerateInstantEntity(argumentEntity.AmountOfGeneratedData)
+            // };
+            
             await _fileHandler.SaveAsJsonFileAsync(instantData, fullPath);
             
             _logger.Information("The process completed.");  
