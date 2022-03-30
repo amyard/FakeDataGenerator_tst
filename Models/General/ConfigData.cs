@@ -1,4 +1,4 @@
-﻿namespace FakeDataGenerator.Models.Instant
+﻿namespace FakeDataGenerator.Models.General
 {
     public class ConfigData
     {

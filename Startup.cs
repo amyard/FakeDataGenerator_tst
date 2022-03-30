@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
-using FakeDataGenerator.Models.Instant;
+using FakeDataGenerator.Models.General;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,6 +30,8 @@ namespace FakeDataGenerator
                     services.AddScoped(cfg => cfg.GetService<IOptions<ConfigData>>().Value);
 
                     services.AddScoped<IFakeDataGenerator, FakeDataGenerator>();
+                    services.AddScoped<IFileHandler, FileHandler>();
+                    services.AddScoped<IGenerateFakeDataEntities, GenerateFakeDataEntities>();
                 })
                 // https://hovermind.com/serilog/logging-to-sink.html
                 .UseSerilog(new LoggerConfiguration()
@@ -40,14 +41,14 @@ namespace FakeDataGenerator
                     .MinimumLevel.Override("System", LogEventLevel.Warning)
                     .Enrich.FromLogContext()
                     .Enrich.WithMachineName()
-                    .Enrich.WithProperty("ApplicationName", AppDomain.CurrentDomain.FriendlyName)
-                    .Enrich.WithProperty("Version", Assembly.GetEntryAssembly().GetName().Version)
+                    .Enrich.WithProperty(nameof(ApplicationInfo.ApplicationName), ApplicationInfo.ApplicationName)
+                    .Enrich.WithProperty(nameof(ApplicationInfo.ApplicationVersion), ApplicationInfo.ApplicationVersion)
                     .WriteTo.File(
                         path: Path.Combine(logFilePath, $"{logFileName}.{DateTime.Now:yyyyMMdd_HHmm}.txt"),
                         shared: true
                     )
                     .WriteTo.Console(
-                        outputTemplate: $"[{{TimeStamp:HH:mm:ss}} {{Level:u3}} {{MachineName}} {{ApplicationName}} {{Version}} ] {{SourceContext}}{{Message:lj}}{{NewLine}}{{Exception}}",
+                        outputTemplate: $"[{{TimeStamp:HH:mm:ss}} {{Level:u3}} {{MachineName}} {{ApplicationName}} {{ApplicationVersion}} ] {{SourceContext}}{{Message:lj}}{{NewLine}}{{Exception}}",
                         theme: AnsiConsoleTheme.Literate
                     )
                     .CreateLogger())

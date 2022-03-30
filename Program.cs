@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using FakeDataGenerator.Models.Instant;
+using FakeDataGenerator.Models.General;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FakeDataGenerator
