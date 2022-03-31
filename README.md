@@ -16,11 +16,21 @@ It will generate 100 Entities into json file.
 
 (optional) Or you can provide your number for generating the entities:
 ```sh 
-dotnet run 1000
+dotnet run --a 1000
 ```
 It will generate the file with 1000 entities.
 
+(optional) Generate file with different models (Case-sensitive)
+```sh
+dotnet run --m Instant
+dotnet run --m TableUser
+```
 
+(optional) Save data as json or csv file (Case-sensitive)
+```sh
+dotnet run --e Json
+dotnet run --m Csv
+```
 ### Amount of data and file size:
 ```shaderlab
 2000 entities   - 1.6864   Mb.

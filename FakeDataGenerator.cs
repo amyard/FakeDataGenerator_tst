@@ -9,7 +9,7 @@ namespace FakeDataGenerator
 {
     public interface IFakeDataGenerator
     {
-        Task GeneratedDataAsync(ArgumentEntity argumentEntity);
+        Task GeneratedDataAsync(ArgumentOptions argumentEntity);
     }
     
     public class FakeDataGenerator: IFakeDataGenerator
@@ -28,7 +28,7 @@ namespace FakeDataGenerator
             PrepareEnvironment();
         }
 
-        public async Task GeneratedDataAsync(ArgumentEntity argumentEntity)
+        public async Task GeneratedDataAsync(ArgumentOptions argumentEntity)
         {
             _logger.Information("Start processing.");
             

@@ -6,7 +6,7 @@ namespace FakeDataGenerator.Processes
 {
     public class DataProcessFactory
     {
-        public IDataProcess GetProcess(ArgumentEntity argumentEntity)
+        public IDataProcess GetProcess(ArgumentOptions argumentEntity)
         {
             if (argumentEntity.EntityNameForMapping == ClassNameForMapping.Instant)
                 return new GenerateInstantEntity();

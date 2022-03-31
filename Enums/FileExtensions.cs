@@ -2,7 +2,7 @@
 {
     public enum FileExtensions
     {
-        JsonExtension,
-        CsvExtension
+        Json,
+        Csv
     }
 }
