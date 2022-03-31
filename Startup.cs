@@ -31,7 +31,6 @@ namespace FakeDataGenerator
 
                     services.AddScoped<IFakeDataGenerator, FakeDataGenerator>();
                     services.AddScoped<IFileHandler, FileHandler>();
-                    services.AddScoped<IGenerateFakeDataEntities, GenerateFakeDataEntities>();
                 })
                 // https://hovermind.com/serilog/logging-to-sink.html
                 .UseSerilog(new LoggerConfiguration()

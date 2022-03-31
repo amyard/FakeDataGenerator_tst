@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using FakeDataGenerator.Enums;
 using FakeDataGenerator.Models.General;
+using FakeDataGenerator.Processes;
 using Serilog;
 
 namespace FakeDataGenerator
@@ -17,15 +17,14 @@ namespace FakeDataGenerator
         private readonly string _generatedDataPath;
         private readonly ILogger _logger;
         private readonly IFileHandler _fileHandler;
-        private readonly IGenerateFakeDataEntities _generateFakeDataEntities;
 
-        public FakeDataGenerator(ConfigData config, ILogger logger, IFileHandler fileHandler, 
-            IGenerateFakeDataEntities generateFakeDataEntities)
+        public FakeDataGenerator(ConfigData config, 
+            ILogger logger, 
+            IFileHandler fileHandler)
         {
             _generatedDataPath = config.GeneratedDataPath;
             _logger = logger;
             _fileHandler = fileHandler;
-            _generateFakeDataEntities = generateFakeDataEntities;
             PrepareEnvironment();
         }
 
@@ -34,18 +33,10 @@ namespace FakeDataGenerator
             _logger.Information("Start processing.");
             
             string fullPath = GenerateFullPath(argumentEntity.AmountOfGeneratedData);
-
-            var instantData = _generateFakeDataEntities.GenerateInstantEntity(argumentEntity.AmountOfGeneratedData);
-
-            // var data = argumentEntity.EntityNameForMapping switch
-            // {
-            //     ClassNameForMapping.Instant => _generateFakeDataEntities.GenerateInstantEntity(argumentEntity
-            //         .AmountOfGeneratedData),
-            //     ClassNameForMapping.TableUser => _generateFakeDataEntities.GenerateTableUserEntity(argumentEntity
-            //         .AmountOfGeneratedData),
-            //     _ => _generateFakeDataEntities.GenerateInstantEntity(argumentEntity.AmountOfGeneratedData)
-            // };
             
+            var process = new DataProcessFactory().GetProcess(argumentEntity);
+            var instantData = process.GenerateFakeDataEntities(argumentEntity.AmountOfGeneratedData);
+
             await _fileHandler.SaveAsJsonFileAsync(instantData, fullPath);
             
             _logger.Information("The process completed.");  
