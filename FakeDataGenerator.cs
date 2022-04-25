@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using FakeDataGenerator.Enums;
 using FakeDataGenerator.Models.General;
 using FakeDataGenerator.Processes;
 using Serilog;
@@ -32,20 +33,28 @@ namespace FakeDataGenerator
         {
             _logger.Information("Start processing.");
             
-            string fullPath = GenerateFullPath(argumentEntity.AmountOfGeneratedData);
-            
             var process = new DataProcessFactory().GetProcess(argumentEntity);
             var instantData = process.GenerateFakeDataEntities(argumentEntity.AmountOfGeneratedData);
 
-            await _fileHandler.SaveAsJsonFileAsync(instantData, fullPath);
+            string fullPath = GenerateFullPath(argumentEntity);
+            
+            switch (argumentEntity.SaveAsExtension)
+            {
+                case FileExtensions.Json:
+                    await _fileHandler.SaveAsJsonFileAsync(instantData, fullPath);
+                    break;
+                case FileExtensions.Csv:
+                    await _fileHandler.SaveAsCsvFileAsync(instantData, fullPath, argumentEntity);
+                    break;
+            }
             
             _logger.Information("The process completed.");  
         }
 
-        private string GenerateFullPath(int amountOfGeneratedData)
+        private string GenerateFullPath(ArgumentOptions argumentOptions)
         {
             return Path.Combine(_generatedDataPath,
-                $"Date_{DateTime.Now:dd_MM_yyyy_hh_ss}-iteration_{amountOfGeneratedData}.json");
+                $"Date_{DateTime.Now:dd_MM_yyyy_hh_ss}-iteration_{argumentOptions.AmountOfGeneratedData}.{argumentOptions.SaveAsExtension.ToString().ToLower()}");
         }
 
         private void PrepareEnvironment()

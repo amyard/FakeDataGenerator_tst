@@ -29,7 +29,7 @@ dotnet run --m TableUser
 (optional) Save data as json or csv file (Case-sensitive)
 ```sh
 dotnet run --e Json
-dotnet run --m Csv
+dotnet run --e Csv
 ```
 ### Amount of data and file size:
 ```shaderlab
